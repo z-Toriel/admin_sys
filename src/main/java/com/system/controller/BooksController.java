@@ -36,6 +36,7 @@ public class BooksController extends BaseController {
         Page<Books> booksList = booksService.page(getPage(), new QueryWrapper<Books>()
                 .like(StrUtil.isNotBlank(name), "name", name)
                 .eq(categoryId!=null,"category_id",categoryId)
+
         );
         booksList.getRecords().forEach(book->{
             String categoryName = categoryService.getById(book.getCategoryId()).getName();
