@@ -36,8 +36,7 @@ public class FansController extends BaseController {
     //SC加密解密的工具
     @Autowired
     BCryptPasswordEncoder passwordEncoder;
-    @Autowired
-    FansService fansService;
+
 
     @GetMapping("/list")
     public Result list(String name) {
