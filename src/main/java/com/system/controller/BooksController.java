@@ -34,13 +34,18 @@ public class BooksController extends BaseController {
     @GetMapping("/list")
     public Result list(String name,Long categoryId) {
         Page<Books> booksList = booksService.page(getPage(), new QueryWrapper<Books>()
-                .like(StrUtil.isNotBlank(name), "name", name)
-                .eq(categoryId!=null,"category_id",categoryId)
-
+                .like(StrUtil.isNotBlank(name), "name", name)   // 如果有名字传过来则根据名字查询对于的书籍
+                .eq(categoryId!=null,"category_id",categoryId)  // 如果有分类的id传过来，则查询对应的书籍
         );
+        // 获取所有查询到的书籍，遍历它们。根据categoryId放入对应的categoryName以及location
         booksList.getRecords().forEach(book->{
-            String categoryName = categoryService.getById(book.getCategoryId()).getName();
-            book.setCategory(categoryName);
+            Category categorybyId = categoryService.getById(book.getCategoryId());  // 获取对应的category对象
+            String categoryName = categorybyId.getName();   // 拿到categoryName
+            book.setCategory(categoryName);     // 设置book的categoryName
+
+            String location = categorybyId.getLocation();   // 拿到该分类在图书馆的具体位置
+            book.setLocation(location);
+
         });
         return Result.success(booksList);
     }
