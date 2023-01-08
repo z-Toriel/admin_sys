@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.*;
 
 import com.system.common.BaseController;
 
+import javax.swing.text.rtf.RTFEditorKit;
+import java.awt.print.Book;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -74,6 +76,27 @@ public class BorrowController extends BaseController {
             }else{
                 return Result.fail("数据添加失败");
             }
+        }
+    }
+
+
+    @PostMapping("/normalReturn/{id}")
+    public Result nomalReturn(@PathVariable Long id){
+        Borrow borrowById = borrowService.getById(id);  // 根据传过来的id获取到借阅对象
+        borrowById.setStatu(1); // 设置借阅状态，1表示正常归还
+        // 将新的借阅信息更新进去
+        boolean b = borrowService.update(borrowById, new QueryWrapper<Borrow>().eq("id", borrowById.getId()));
+
+        Books bookByID = booksService.getById(borrowById.getBid()); // 根据借阅对象的bid获取到book对象
+        Integer remain = bookByID.getRemain();  // 获取到剩余的数量
+        bookByID.setRemain(remain+1);   // 将剩余的数量 +1
+        // 将信息的书籍信息跟新进去
+        boolean b1 = booksService.update(bookByID, new QueryWrapper<Books>().eq("id", bookByID.getId()));
+
+        if (b && b1){
+            return Result.success("归还成功");
+        }else {
+            return Result.fail("归还失败");
         }
 
     }
