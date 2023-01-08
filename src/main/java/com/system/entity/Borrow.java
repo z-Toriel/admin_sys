@@ -30,17 +30,26 @@ public class Borrow extends BaseEntity {
     @TableField("uid")
     private Long uid;
 
+    @TableField(exist = false)
+    private String uname;
+
     /**
      * 书籍id
      */
     @TableField("bid")
     private Long bid;
 
+    @TableField(exist = false)
+    private String bname;
+
     /**
      * 借阅日期
      */
     @TableField("borrow_date")
     private LocalDate borrowDate;
+
+    @TableField(exist = false)
+    private Long days;
 
     /**
      * 还书日期
