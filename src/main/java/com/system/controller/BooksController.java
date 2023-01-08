@@ -64,6 +64,7 @@ public class BooksController extends BaseController {
     public Result save(@RequestBody Books books){
         books.setIsDelete(1);
         books.setCreated(LocalDateTime.now());
+        books.setCreated(LocalDateTime.now());
         if(booksService.save(books)){
             return Result.success(books);
         }else {

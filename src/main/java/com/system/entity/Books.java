@@ -44,11 +44,17 @@ public class Books extends BaseEntity {
     @TableField("press")
     private String press;
 
+    @TableField("remain")
+    private Integer remain;
+
     /**
      * 数量
      */
     @TableField("total")
     private Integer total;
+
+    @TableField("price")
+    private Integer price;
 
 
     @TableField("is_delete")
