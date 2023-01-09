@@ -31,7 +31,7 @@ import java.util.List;
 @RequestMapping("/system/borrow")
 public class BorrowController extends BaseController {
     @GetMapping("/list")
-    public Result list(String bname, String uname) {
+    public Result list(String bname, String uname,Integer statuCode) {
         List<Long> bids = new ArrayList<>();
         List<Long> uids = new ArrayList<>();
 
@@ -50,6 +50,7 @@ public class BorrowController extends BaseController {
         Page<Borrow> borrowList = borrowService.page(getPage(), new QueryWrapper<Borrow>()
                 .in(bids.size() > 0, "bid", bids)
                 .in(uids.size() > 0, "uid", uids)
+                .eq(statuCode!=null,"statu",statuCode)
                 .last("order by statu")
         );
 
@@ -68,6 +69,8 @@ public class BorrowController extends BaseController {
         });
         return Result.success(borrowList);
     }
+
+
 
 
     @PostMapping("/save")
