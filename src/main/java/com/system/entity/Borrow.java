@@ -3,6 +3,8 @@ package com.system.entity;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.system.common.BaseEntity;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -52,10 +54,25 @@ public class Borrow extends BaseEntity {
     private Long days;
 
     /**
-     * 还书日期
+     * 预计还书日期
      */
     @TableField("return_date")
     private LocalDate returnDate;
+
+
+    /**
+     * 实际还书日期
+     */
+    @TableField("real_return_date")
+    private LocalDate realReturnDate;
+
+
+    /**
+     * 赔偿金额
+     */
+    @TableField("compensation")
+    private Integer compensation;
+
 
 
 }
