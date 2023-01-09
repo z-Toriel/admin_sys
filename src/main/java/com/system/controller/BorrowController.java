@@ -50,6 +50,7 @@ public class BorrowController extends BaseController {
         Page<Borrow> borrowList = borrowService.page(getPage(), new QueryWrapper<Borrow>()
                 .in(bids.size() > 0, "bid", bids)
                 .in(uids.size() > 0, "uid", uids)
+                .last("order by statu")
         );
 
         borrowList.getRecords().forEach(item -> {
@@ -164,6 +165,26 @@ public class BorrowController extends BaseController {
             return Result.success("书籍归还成功(破损)");
         }else{
             return Result.fail("书籍归还失败(破损)");
+        }
+    }
+
+    @PostMapping("/lost/{id}")
+    public Result lost(@PathVariable Long id) {
+        Borrow borrowById = borrowService.getById(id);  // 获取借阅对象
+        borrowById.setUpdated(LocalDateTime.now()); // 设置更新时间
+        borrowById.setStatu(4); // 设置状态 3表示书籍破损
+        borrowById.setRealReturnDate(LocalDate.now());  // 设置实际归还时间
+
+        Long bid = borrowById.getBid();
+        Books bookById = booksService.getById(bid); // 获取书籍对象
+        Integer price = bookById.getPrice();    // 获取书籍价格
+        borrowById.setCompensation(price); // 设置赔偿金额
+
+        boolean b = borrowService.update(borrowById, new QueryWrapper<Borrow>().eq("id", id));
+        if(b){
+            return Result.success("书籍丢失");
+        }else{
+            return Result.fail("书籍丢失失败");
         }
     }
 }
