@@ -34,6 +34,8 @@ public class BaseController {
     public BooksEvaluateService booksEvaluateService;
     @Autowired
     public BorrowService borrowService;
+    @Autowired
+    public PosterService posterService;
 
     // 获得分页数据 前端请求的时候会传递参数：current,size,得到参数封装给page对象（mp分页使用）
     public Page getPage(){
