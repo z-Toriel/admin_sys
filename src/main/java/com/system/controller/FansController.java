@@ -56,6 +56,7 @@ public class FansController extends BaseController {
             fans.setPassword(passwordEncoder.encode(Const.DEFAULT_PWD));
             fans.setStatu(Const.STATUS_ON);   //设置用户 状态
             fans.setDeltag(Const.STATUS_ON);    //设置用户的逻辑删除
+            fans.setRemainBorrowNumber(Const.DEFAULT_BORROW_NUMBER); // 设置用户的借阅数量
             fansService.save(fans);
             return Result.success(fans);
         }else { //3如果存在则返回失败

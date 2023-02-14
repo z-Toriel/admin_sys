@@ -61,6 +61,8 @@ public class Books extends BaseEntity {
     @TableLogic(value = "1",delval = "0")
     private Integer isDelete;
 
+
+
     @TableField(exist = false)
     private String location;
 

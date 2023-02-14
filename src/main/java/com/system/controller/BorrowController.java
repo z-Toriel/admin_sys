@@ -79,15 +79,21 @@ public class BorrowController extends BaseController {
         Long uid = borrow.getUid();
         Books booksById = booksService.getById(bid);
         Fans fansByID = fansService.getById(uid);
+
         if (booksById == null) {
             return Result.fail("书籍不存在");
         } else if (fansByID == null) {
             return Result.fail("用户不存在");
-        } else {
+        } else if (fansByID.getRemainBorrowNumber() <= 0){
+            return Result.fail("该用户已借阅3本书籍");
+        }else {
             Integer remain = booksById.getRemain();
+            Integer remainBorrowNumber = fansByID.getRemainBorrowNumber();
             if (remain == 0) {
                 return Result.fail("该书籍已经没有了");
             }
+            fansByID.setRemainBorrowNumber(remainBorrowNumber-1);   // 设置用户可借阅数量-1
+            fansService.update(fansByID,new QueryWrapper<Fans>().eq("id",fansByID.getId()));    // 跟新用户信息
             booksById.setRemain(remain - 1);   //设置该书籍的剩余数量 -1
             booksService.update(booksById, new QueryWrapper<Books>().eq("id", booksById.getId()));   // 保存该书籍
             borrow.setCreated(LocalDateTime.now()); //设置创建时间
@@ -107,6 +113,7 @@ public class BorrowController extends BaseController {
     }
 
 
+    // 正常归还
     @PostMapping("/normalReturn/{id}")
     public Result nomalReturn(@PathVariable Long id) {
         Borrow borrowById = borrowService.getById(id);  // 根据传过来的id获取到借阅对象
@@ -122,13 +129,20 @@ public class BorrowController extends BaseController {
         // 将信息的书籍信息跟新进去
         boolean b1 = booksService.update(bookByID, new QueryWrapper<Books>().eq("id", bookByID.getId()));
 
-        if (b && b1) {
+        Fans FansByID = fansService.getById(borrowById.getUid());   // 根据借阅对象的uid获取到Fans对象
+        Integer remainBorrowNumber = FansByID.getRemainBorrowNumber();  // 获取该用户的剩余借阅数量
+        FansByID.setRemainBorrowNumber(remainBorrowNumber+1);   // 将剩余借阅数量+1
+        boolean b2 = fansService.update(FansByID, new QueryWrapper<Fans>().eq("id", FansByID.getId())); // 将用户信息更新
+
+
+        if (b && b1 && b2) {
             return Result.success("归还成功");
         } else {
             return Result.fail("归还失败");
         }
     }
 
+    // 逾期归还
     @PostMapping("/overdueReturn/{id}/{overdueDays}")
     public Result overdueReturn(@PathVariable Long id, @PathVariable Integer overdueDays) {   // overdueDays是逾期了几天
         Borrow borrowById = borrowService.getById(id);
@@ -143,13 +157,22 @@ public class BorrowController extends BaseController {
         Books bookById = booksService.getById(bid);
         bookById.setRemain(bookById.getRemain() + 1);
         boolean b1 = booksService.update(bookById, new QueryWrapper<Books>().eq("id", bid));
-        if (b && b1) {
+
+        // 获取Fans对象，将Fans剩余的借阅数量+1
+        Fans FansByID = fansService.getById(borrowById.getUid());   // 根据借阅对象的uid获取到Fans对象
+        Integer remainBorrowNumber = FansByID.getRemainBorrowNumber();  // 获取该用户的剩余借阅数量
+        FansByID.setRemainBorrowNumber(remainBorrowNumber+1);   // 将剩余借阅数量+1
+        boolean b2 = fansService.update(FansByID, new QueryWrapper<Fans>().eq("id", FansByID.getId())); // 将用户信息更新
+
+        if (b && b1 && b2) {
             return Result.success("逾期归还成功");
         } else {
             return Result.fail("逾期归还失败");
         }
     }
 
+
+    // 书籍破损归还
     @PostMapping("/breakReturn/{id}")
     public Result breakReturn(@PathVariable Long id) {
         Borrow borrowById = borrowService.getById(id);  // 获取借阅对象
@@ -164,13 +187,22 @@ public class BorrowController extends BaseController {
         borrowById.setCompensation(price); // 设置赔偿金额
 
         boolean b = borrowService.update(borrowById, new QueryWrapper<Borrow>().eq("id", id));
-        if(b){
+
+        // 获取Fans对象，将Fans剩余的借阅数量+1
+        Fans FansByID = fansService.getById(borrowById.getUid());   // 根据借阅对象的uid获取到Fans对象
+        Integer remainBorrowNumber = FansByID.getRemainBorrowNumber();  // 获取该用户的剩余借阅数量
+        FansByID.setRemainBorrowNumber(remainBorrowNumber+1);   // 将剩余借阅数量+1
+        boolean b2 = fansService.update(FansByID, new QueryWrapper<Fans>().eq("id", FansByID.getId())); // 将用户信息更新
+
+        if(b && b2){
             return Result.success("书籍归还成功(破损)");
         }else{
             return Result.fail("书籍归还失败(破损)");
         }
     }
 
+
+    // 书籍丢失
     @PostMapping("/lost/{id}")
     public Result lost(@PathVariable Long id) {
         Borrow borrowById = borrowService.getById(id);  // 获取借阅对象
@@ -184,7 +216,14 @@ public class BorrowController extends BaseController {
         borrowById.setCompensation(price); // 设置赔偿金额
 
         boolean b = borrowService.update(borrowById, new QueryWrapper<Borrow>().eq("id", id));
-        if(b){
+
+        // 获取Fans对象，将Fans剩余的借阅数量+1
+        Fans FansByID = fansService.getById(borrowById.getUid());   // 根据借阅对象的uid获取到Fans对象
+        Integer remainBorrowNumber = FansByID.getRemainBorrowNumber();  // 获取该用户的剩余借阅数量
+        FansByID.setRemainBorrowNumber(remainBorrowNumber+1);   // 将剩余借阅数量+1
+        boolean b2 = fansService.update(FansByID, new QueryWrapper<Fans>().eq("id", FansByID.getId())); // 将用户信息更新
+
+        if(b && b2){
             return Result.success("书籍丢失");
         }else{
             return Result.fail("书籍丢失失败");
